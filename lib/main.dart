@@ -11,108 +11,478 @@ class SyrianBaccalaureateApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'تطبيق البكالوريا السورية',
+      title: 'البكالوريا السورية العلمية',
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
       theme: ThemeData(
-        primarySwatch: Colors.blue,
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1E88E5),
+          brightness: Brightness.light,
+        ),
+        fontFamily: 'sans-serif',
       ),
-      home: const HomeScreen(),
+      home: const MainHomeScreen(),
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class MainHomeScreen extends StatefulWidget {
+  const MainHomeScreen({super.key});
+
+  @override
+  State<MainHomeScreen> createState() => _MainHomeScreenState();
+}
+
+class _MainHomeScreenState extends State<MainHomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = const [
+    DashboardView(),
+    SubjectsView(),
+    SchedulesView(),
+    QuizView(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تطبيق البكالوريا السورية - الفرع العلمي'),
+        title: const Text(
+          'تطبيق البكالوريا السورية - الفرع العلمي',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'حول التطبيق',
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                MaterialPageRoute(builder: (context) => const AboutScreen()),
               );
             },
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Card(
-              elevation: 4,
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'مرحباً بك يا بطل!',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'تطبيقك الخيري المجاني لدعم طلاب البكالوريا العلمية في سوريا - دراسة بدون إنترنت، جداول، وشروحات.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'الرئيسية',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.menu_book_outlined),
+            selectedIcon: Icon(Icons.menu_book),
+            label: 'المواد',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_today_outlined),
+            selectedIcon: Icon(Icons.calendar_today),
+            label: 'الجداول',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.quiz_outlined),
+            selectedIcon: Icon(Icons.quiz),
+            label: 'اختبارات',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------
+// 1. الواجهة الرئيسية
+// ---------------------------------------------------------
+class DashboardView extends StatelessWidget {
+  const DashboardView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
               ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                )
+              ],
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.book),
-              label: const Text('المواد الدراسية والمنهاج'),
+            child: const Column(
+              children: [
+                Icon(Icons.school, size: 50, color: Colors.white),
+                SizedBox(height: 10),
+                Text(
+                  'أهلاً بك يا بطل البكالوريا!',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'تطبيق تعليمي مجاني يعمل بدون إنترنت لدعم طلاب الفرع العلمي في سوريا.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.white90),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.schedule),
-              label: const Text('جداول الدراسة'),
-            ),
-          ],
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'الأقسام السريعة',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            children: [
+              _buildFeatureCard(
+                context,
+                title: 'منهاج العلمي',
+                subtitle: 'شروحات وملخصات المواد',
+                icon: Icons.auto_stories,
+                color: Colors.orange.shade700,
+                onTap: () {},
+              ),
+              _buildFeatureCard(
+                context,
+                title: 'جداول الدراسة',
+                subtitle: 'خريطة تنظيم الوقت',
+                icon: Icons.access_time_filled,
+                color: Colors.green.shade700,
+                onTap: () {},
+              ),
+              _buildFeatureCard(
+                context,
+                title: 'اختبارات سريعة',
+                subtitle: 'تثبيت ومراجعة الأفكار',
+                icon: Icons.assignment_turned_in,
+                color: Colors.purple.shade700,
+                onTap: () {},
+              ),
+              _buildFeatureCard(
+                context,
+                title: 'المطور والداعم',
+                subtitle: 'إهداء من أب عُدي',
+                icon: Icons.favorite,
+                color: Colors.red.shade600,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                backgroundColor: color.withOpacity(0.15),
+                radius: 26,
+                child: Icon(icon, color: color, size: 30),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+// ---------------------------------------------------------
+// 2. قسم المواد الدراسية
+// ---------------------------------------------------------
+class SubjectsView extends StatelessWidget {
+  const SubjectsView({super.key});
+
+  final List<Map<String, dynamic>> subjects = const [
+    {
+      'name': 'الرياضيات',
+      'detail': 'التحليل، الهندسة، المتتاليات، والاحتمالات',
+      'icon': Icons.calculate,
+      'color': Colors.blue,
+    },
+    {
+      'name': 'الفيزياء',
+      'detail': 'النواس السادة، الحركة الدائرية، والكهرباء والمغناطيسية',
+      'icon': Icons.bolt,
+      'color': Colors.deepOrange,
+    },
+    {
+      'name': 'الكيمياء',
+      'detail': 'الكيمياء النووية، الحركية، التوازن، والحموض والقواعد',
+      'icon': Icons.science,
+      'color': Colors.teal,
+    },
+    {
+      'name': 'العلوم العامة (علم الأحياء)',
+      'detail': 'التنسيق عصبي، المستقبلات، الهرمونات، والتكاثر',
+      'icon': Icons.biotech,
+      'color': Colors.green,
+    },
+    {
+      'name': 'اللغة العربية',
+      'detail': 'القواعد، الإعراب، النصوص الشعريّة، والتعبير الكتابي',
+      'icon': Icons.menu_book,
+      'color': Colors.amber,
+    },
+    {
+      'name': 'اللغة الإنكليزية',
+      'detail': 'القواعد الأساسية، النصوص، والمفردات والتعبير',
+      'icon': Icons.language,
+      'color': Colors.indigo,
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: subjects.length,
+      itemBuilder: (context, index) {
+        final item = subjects[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: item['color'].withOpacity(0.2),
+              child: Icon(item['icon'], color: item['color']),
+            ),
+            title: Text(
+              item['name'],
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(item['detail']),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('تم فتح محتوى مادة ${item['name']} (أوفلاين)'),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ---------------------------------------------------------
+// 3. قسم جداول الدراسة
+// ---------------------------------------------------------
+class SchedulesView extends StatelessWidget {
+  const SchedulesView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Card(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'خطة الدراسية التكتيكية (أسبوعية)',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'توزيع روتيني متوازن يضمن مراجعة المواد الصعبة مع الاستراحة المناسبة.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildScheduleItem('السبت والأحد', 'تركيز كامل على الرياضيات والفيزياء (حذف العقد والتطبيقات).'),
+        _buildScheduleItem('الإثنين والثلاثاء', 'علوم أحياء (جلسات حفظ وتثبيت) + كيمياء حركية وتوازن.'),
+        _buildScheduleItem('الأربعاء والخميس', 'اللغة العربية واللغات الأجنبية + حل دورات امتحانية.'),
+        _buildScheduleItem('الجمعة', 'مراجعة عامة شاملة + استراحة وإعادة ترتيب الأولويات.'),
+      ],
+    );
+  }
+
+  Widget _buildScheduleItem(String days, String task) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: const Icon(Icons.check_circle_outline, color: Colors.blue),
+        title: Text(days, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(task),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------
+// 4. قسم الاختبارات والتثبيت
+// ---------------------------------------------------------
+class QuizView extends StatelessWidget {
+  const QuizView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.quiz, size: 70, color: Color(0xFF1E88E5)),
+          const SizedBox(height: 16),
+          const Text(
+            'اختبارات تثبيت المعلومات',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'بنك أسئلة تفاعلي يعمل بدون إنترنت للتدرب على نماذج الأسئلة السريعة والأجوبة النموذجية.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('بدء بنك الأسئلة التفاعلي...')),
+              );
+            },
+            icon: const Icon(Icons.play_arrow),
+            label: const Text('ابدأ الاختبار الآن'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------
+// 5. شاشة المطور والمعلومات (عن التطبيق)
+// ---------------------------------------------------------
+class AboutScreen extends StatelessWidget {
+  const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الإعدادات'),
+        title: const Text('عن التطبيق والمطور'),
         centerTitle: true,
       ),
-      body: ListView(
-        children: [
-          const ListTile(
-            leading: Icon(Icons.person, color: Colors.blue),
-            title: Text('المطور'),
-            subtitle: Text('أب عُدي'),
-          ),
-          const Divider(),
-          const ListTile(
-            leading: Icon(Icons.info, color: Colors.blue),
-            title: Text('عن التطبيق'),
-            subtitle: Text('تطبيق مجاني لخدمة طلاب البكالوريا السورية العلمية'),
-          ),
-        ],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            const CircleAvatar(
+              radius: 45,
+              backgroundColor: Color(0xFF1976D2),
+              child: Icon(Icons.person, size: 50, color: Colors.white),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'إشراف وتطوير: أب عُدي',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'مشروع تعليمي خيري مفتوح المصدر',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+            const Divider(height: 40),
+            const ListTile(
+              leading: Icon(Icons.check_circle, color: Colors.green),
+              title: Text('يعمل 100% بدون إنترنت'),
+              subtitle: Text('تم تصميمه ليعمل بمرونة ودون الحاجة لاتصال بالشبكة.'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.stars, color: Colors.amber),
+              title: Text('مخصص لطلاب البكالوريا السورية'),
+              subtitle: Text('يحتوي على مواد وخطة الفرع العلمي.'),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('العودة للتطبيق'),
+            ),
+          ],
+        ),
       ),
     );
   }
